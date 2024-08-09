@@ -15,26 +15,45 @@ import java.util.regex.Pattern;
 public class StringCalculator {
 
     public int add(String text) {
-        if (text == null || text.isEmpty()) return 0;
+        if (isBlank(text)) {
+            return 0;
+        }
+        return sum(toPositives(split(text)));
+    }
+
+    private boolean isBlank(String text) {
+        return text == null || text.isEmpty();
+    }
+
+    private String[] split(String text) {
         Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
         if (m.find()) {
             String customDelimiter = m.group(1);
-            String[] tokens = m.group(2).split(customDelimiter);
-            return addNumbersSplitBy(tokens);
+            return m.group(2).split(customDelimiter);
         }
-        String[] tokens = text.split(",|:");
-        return addNumbersSplitBy(tokens);
+        return text.split(",|:");
     }
 
-    private int addNumbersSplitBy(String[] tokens) {
+    private int[] toPositives(String[] values) {
+        int[] numbers = new int[values.length];
+        for (int i = 0; i < values.length; i++) {
+            numbers[i] = Integer.parseInt(values[i]);
+        }
+        return numbers;
+    }
+
+    private int sum(int[] numbers) {
         int sum = 0;
-        for (String token : tokens) {
-            int number = Integer.parseInt(token);
-            if (number < 0) {
-                throw new RuntimeException();
-            }
+        for (int number : numbers) {
+            checkIfNumberIsNegative(number);
             sum += number;
         }
         return sum;
+    }
+
+    private static void checkIfNumberIsNegative(int number) {
+        if (number < 0) {
+            throw new RuntimeException();
+        }
     }
 }
